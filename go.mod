@@ -30,4 +30,4 @@ require (
 	golang.org/x/sync v0.8.0 // indirect
 )
 
-replace golang.org/x/arch v0.11.0 => github.com/zte-riscv/arch v0.0.0-20260703020913-057d8d6177f6
+replace golang.org/x/arch v0.11.0 => github.com/zte-riscv/arch v0.0.0-20260703055027-c02ede54b9ac
