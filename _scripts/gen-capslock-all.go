@@ -106,7 +106,7 @@ func main() {
 func generateCapslock(platform Platform) error {
 	outputFile := fmt.Sprintf("_scripts/capslock_%s_%s-output.txt", platform.GOOS, platform.GOARCH)
 
-	args := []string{"run", "github.com/google/capslock/cmd/capslock@latest"}
+	args := []string{"run", "github.com/google/capslock/cmd/capslock@v0.2.7"}
 	if platform.BuildTags != "" {
 		args = append(args, "-buildtags", platform.BuildTags)
 	}

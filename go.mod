@@ -29,3 +29,5 @@ require (
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 )
+
+replace golang.org/x/arch v0.11.0 => github.com/zte-riscv/arch v0.0.0-20260703055027-c02ede54b9ac

@@ -42,7 +42,8 @@ export GOARCH="$ARCH"
 export PATH="$GOROOT/bin:$PATH"
 go version
 
-go install github.com/google/capslock/cmd/capslock@latest
+export GOTOOLCHAIN=local
+go install github.com/google/capslock/cmd/capslock@v0.2.7
 
 set +e
 make test
