@@ -96,6 +96,7 @@ Write-Host $env:GOPATH
 
 Get-Command go
 
+$env:GOTOOLCHAIN = "local"
 go install github.com/google/capslock/cmd/capslock@v0.2.7
 
 go version
