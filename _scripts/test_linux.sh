@@ -61,7 +61,7 @@ if [ "$arch" != "ppc64le" ]; then
 	go install honnef.co/go/tools/cmd/staticcheck@2025.1.1 || true
 fi
 
-go install github.com/google/capslock/cmd/capslock@latest
+go install github.com/google/capslock/cmd/capslock@v0.2.7
 
 uname -a
 echo "$PATH"
