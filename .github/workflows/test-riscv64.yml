@@ -1,0 +1,77 @@
+name: Test Linux RISC-V 64
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+# Cancel existing runs if user makes another push.
+concurrency:
+  group: "${{ github.ref }}-${{ github.workflow }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test-riscv64:
+    runs-on: banana-pi-f3
+    timeout-minutes: 120
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Only test with stable Go versions on RISC-V.
+        # "tip" is excluded because RISC-V toolchain support in gotip
+        # is not always available.
+        go-version: ["1.26"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install --no-upgrade -y gcc wget jq lsof git dwz
+          dwz --version
+
+      - name: Install Go for riscv64
+        run: |
+          arch=riscv64
+          version="${{ matrix.go-version }}"
+
+          # Find the latest patch release for the given minor version.
+          version=$(wget -q -O - 'https://go.dev/dl/?mode=json&include=all' \
+            | jq '.[].version' --raw-output \
+            | grep -E "^go${version}($|\.|beta|rc)" \
+            | sort -rV | head -1)
+
+          if [ -z "$version" ]; then
+            echo "ERROR: could not find Go ${{ matrix.go-version }} for $arch"
+            exit 1
+          fi
+
+          echo "Installing $version for linux/$arch"
+          wget -q "https://dl.google.com/go/${version}.linux-${arch}.tar.gz"
+          sudo mkdir -p /usr/local/go
+          sudo tar -C /usr/local/go -xzf "${version}.linux-${arch}.tar.gz"
+          sudo mv /usr/local/go/go "/usr/local/go/${version}"
+          rm -f "${version}.linux-${arch}.tar.gz"
+
+          echo "GOROOT=/usr/local/go/${version}" >> "$GITHUB_ENV"
+          echo "/usr/local/go/${version}/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Go installation
+        run: |
+          go version
+          uname -a
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@2025.1.1 || true
+
+      - name: Install capslock
+        run: go install github.com/google/capslock/cmd/capslock@latest
+
+      - name: Run tests
+        run: go run _scripts/make.go test -v
+        env:
+          GOFLAGS: -buildvcs=false
+          CI: "true"
