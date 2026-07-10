@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   test-riscv64:
-    runs-on: banana-pi-f3
+    runs-on: milkv-pioneer
     timeout-minutes: 120
 
     strategy:
