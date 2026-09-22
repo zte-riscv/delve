@@ -377,7 +377,12 @@ func (dbp *nativeProcess) initialize(path string, debugInfoDirs []string) (*proc
 		//    instructions, if the sequence happens to contain a breakpoint it will
 		//    look like the breakpoint was hit twice when it was "logically" only
 		//    executed once.
-		DisableAsyncPreempt: runtime.GOOS == "windows" || (runtime.GOOS == "linux" && runtime.GOARCH == "arm64") || (runtime.GOOS == "linux" && runtime.GOARCH == "ppc64le") || (runtime.GOOS == "linux" && runtime.GOARCH == "loong64"),
+		//  - on linux/riscv64 the signal-based asyncpreempt is not integrated
+		//    with the runtime's signal handling machinery, which causes the
+		//    traced program to fail to resume properly after a breakpoint is
+		//    hit, due to a race between the signal handler and the debugger.
+		//    See: https://github.com/golang/go/issues/64761
+		DisableAsyncPreempt: runtime.GOOS == "windows" || (runtime.GOOS == "linux" && runtime.GOARCH == "arm64") || (runtime.GOOS == "linux" && runtime.GOARCH == "ppc64le") || (runtime.GOOS == "linux" && runtime.GOARCH == "loong64") || (runtime.GOOS == "linux" && runtime.GOARCH == "riscv64"),
 
 		StopReason: stopReason,
 		CanDump:    runtime.GOOS == "linux" || runtime.GOOS == "freebsd" || (runtime.GOOS == "windows" && runtime.GOARCH == "amd64"),
